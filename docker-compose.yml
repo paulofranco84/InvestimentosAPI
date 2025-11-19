@@ -1,0 +1,6 @@
+services:
+  investimentos.api:
+    image: ${DOCKER_REGISTRY-}investimentosapi
+    build:
+      context: .
+      dockerfile: Investimentos.API\Dockerfile
