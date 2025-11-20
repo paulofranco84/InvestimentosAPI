@@ -1,11 +1,14 @@
 ﻿namespace Investimentos.API.Middlewares;
 
+using Investimentos.Infrastructure.Context;
+using Investimentos.Infrastructure.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.Metrics;
 
 public class TelemetryMiddleware
 {
     private readonly RequestDelegate _next;
-    private static readonly Meter Meter = new("InvestimentosApi.Metrics", "1.0");
+        private static readonly Meter Meter = new("InvestimentosApi.Metrics", "1.0");
     private static readonly Counter<int> RequestCounter = Meter.CreateCounter<int>("api_requests_total");
     private static readonly Histogram<double> ResponseTimeHistogram = Meter.CreateHistogram<double>("api_response_time_ms");
 
@@ -16,67 +19,29 @@ public class TelemetryMiddleware
 
     public async Task Invoke(HttpContext context)
     {
+        var _context = context.RequestServices.GetRequiredService<AppDbContext>();
         var start = DateTime.UtcNow;
         await _next(context);
         var elapsed = (DateTime.UtcNow - start).TotalMilliseconds;
 
-        var endpoint = context.Request.Path.ToString();
-        RequestCounter.Add(1, new KeyValuePair<string, object?>("endpoint", endpoint));
-        ResponseTimeHistogram.Record(elapsed, new KeyValuePair<string, object?>("endpoint", endpoint));
+        var rawPattern = (context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint)?
+            .RoutePattern
+            .RawText ?? context.Request.Path.ToString();
 
-        MetricsAggregator.Add(endpoint, elapsed);
-    }
-}
+        var routePattern = string.Join('/',
+            rawPattern.Split('/', StringSplitOptions.RemoveEmptyEntries)
+                      .Where(segment => !segment.StartsWith("{"))
+        );
 
-public static class MetricsAggregator
-{
-    private static readonly Dictionary<string, List<(DateTime Timestamp, double Elapsed)>> Data = new();
-
-    public static void Add(string endpoint, double elapsed)
-    {
-        lock (Data)
+        RequestCounter.Add(1, new KeyValuePair<string, object?>("endpoint", routePattern));
+        ResponseTimeHistogram.Record(elapsed, new KeyValuePair<string, object?>("endpoint", routePattern));
+        _context.RegistrosTelemetria.Add(new RegistroTelemetria
         {
-            if (!Data.ContainsKey(endpoint))
-                Data[endpoint] = new List<(DateTime, double)>();
+            Endpoint = routePattern,
+            Timestamp = DateTime.UtcNow,
+            TempoRespostaMs = elapsed
+        });
 
-            Data[endpoint].Add((DateTime.UtcNow, elapsed));
-        }
-    }
-
-    public static object GetSummary(DateTime? startDate = null, DateTime? endDate = null)
-    {
-        lock (Data)
-        {
-            var inicio = startDate ?? DateTime.UtcNow.AddDays(-1); // default: último dia
-            var fim = (endDate?.Date ?? DateTime.UtcNow.Date).AddDays(1).AddTicks(-1); // Isso define fim como 23:59:59.999 do dia informado
-
-
-            var servicos = Data.Select(kv =>
-            {
-                var registros = kv.Value
-                    .Where(r => r.Timestamp >= inicio && r.Timestamp <= fim)
-                    .ToList();
-
-                var count = registros.Count;
-                var totalTime = registros.Sum(r => r.Elapsed);
-
-                return new
-                {
-                    nome = kv.Key.Replace("api/", "").Trim('/'),
-                    quantidadeChamadas = count,
-                    mediaTempoRespostaMs = count > 0 ? Math.Round(totalTime / count, 2) : 0
-                };
-            }).ToList();
-
-            return new
-            {
-                servicos,
-                periodo = new
-                {
-                    inicio = inicio.ToString("yyyy-MM-dd"),
-                    fim = fim.ToString("yyyy-MM-dd")
-                }
-            };
-        }
+        await _context.SaveChangesAsync();
     }
 }

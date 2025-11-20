@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Investimentos.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251119191810_CriacaoDoBanco")]
+    [Migration("20251120160226_CriacaoDoBanco")]
     partial class CriacaoDoBanco
     {
         /// <inheritdoc />
@@ -196,6 +196,27 @@ namespace Investimentos.API.Migrations
                     b.HasIndex("ProdutoId");
 
                     b.ToTable("Simulacoes");
+                });
+
+            modelBuilder.Entity("Investimentos.Infrastructure.Models.RegistroTelemetria", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("TempoRespostaMs")
+                        .HasColumnType("REAL");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RegistrosTelemetria");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

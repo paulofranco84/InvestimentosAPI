@@ -102,6 +102,21 @@ namespace Investimentos.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RegistrosTelemetria",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Endpoint = table.Column<string>(type: "TEXT", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    TempoRespostaMs = table.Column<double>(type: "REAL", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RegistrosTelemetria", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -297,6 +312,9 @@ namespace Investimentos.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "Investimentos");
+
+            migrationBuilder.DropTable(
+                name: "RegistrosTelemetria");
 
             migrationBuilder.DropTable(
                 name: "Simulacoes");

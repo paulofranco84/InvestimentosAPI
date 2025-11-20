@@ -17,14 +17,25 @@ public class InvestimentosController : ControllerBase
         _uof = unitOfWork;
     }
 
-    [HttpGet("ObterPorCliente/{clienteId}")]
+    [HttpGet("{clienteId:int}")]
     public async Task<IActionResult> Obter(int clienteId)
     {
         var cliente = await _uof.ClienteRepository.GetAsync(c => c.Id == clienteId);
-        if (cliente is null) return NotFound("Cliente não cadastrado");
+        if (cliente is null)
+            return NotFound("Cliente não cadastrado");
 
         var investimentos = await _uof.InvestimentoRepository.ObterPorClienteAsync(clienteId);
-        return Ok(investimentos);
+
+        var investimentosDto = investimentos.Select(i => new InvestimentoResponseDTO
+        {
+            Id = i.Id,
+            tipo = i.Tipo, 
+            Valor = i.Valor,
+            Rentabilidade = i.Rentabilidade,
+            Data = i.Data.ToString("yyyy-MM-dd"),
+        });
+
+        return Ok(investimentosDto);
     }
 
     [HttpPost("Investir")]
@@ -59,7 +70,7 @@ public class InvestimentosController : ControllerBase
         return Ok(novoInvestimento);
     }
 
-    [HttpGet("{investimentoId:int}", Name = "ObterInvestimento")]
+    [HttpGet("ListarInvestimentos/{investimentoId:int}")]
     public async Task<ActionResult<Investimento>> GetAsync(int investimentoId)
     {
         var investimento = await _uof.InvestimentoRepository.GetAsync(investimentoId);

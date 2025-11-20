@@ -116,11 +116,29 @@ builder.Services.AddScoped<IPerfilRiscoService, PerfilRiscoService>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<SimulacaoService>();
+builder.Services.AddScoped<TelemetryService>();
 
 builder.Services.AddDataProtection()
     .PersistKeysToFileSystem(new DirectoryInfo("C:/app/DataProtection-Keys"));
 
 var app = builder.Build();
+
+//app.Use(async (context, next) =>
+//{
+//    var dbContext = context.RequestServices.GetRequiredService<AppDbContext>();
+//    var middleware = new TelemetryMiddleware(next, dbContext);
+//    await middleware.Invoke(context);
+//});
+
+//using (var scope = app.Services.CreateScope())
+//{
+//    app.Use(async (context, next) =>
+//    {
+//        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//        var middleware = new TelemetryMiddleware(next, dbContext);
+//        await middleware.Invoke(context);
+//    });
+//}
 
 using (var scope = app.Services.CreateScope())
 {

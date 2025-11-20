@@ -31,7 +31,7 @@ public class SimulacaoRepository : ISimulacaoRepository
             .Select(g => new
             {
                 Produto = g.Key.Nome,
-                Data = g.Key.Data,
+                Data = g.Key.Data.ToString("yyyy-MM-dd"),
                 QuantidadeSimulacoes = g.Count(),
                 MediaValorFinal = g.Average(s => s.ValorFinal).ToString("F2",CultureInfo.InvariantCulture)
             })

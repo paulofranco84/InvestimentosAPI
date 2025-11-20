@@ -1,4 +1,5 @@
-﻿using Investimentos.Domain.Entities;
+﻿using Investimentos.Application.DTOs;
+using Investimentos.Domain.Entities;
 using Investimentos.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -86,6 +87,15 @@ public class ProdutosController : ControllerBase
 
         if (!produtos.Any()) return BadRequest("Perfil inválido");
 
-        return Ok(produtos);
+        var produtosDto = produtos.Select(i => new ProdutoDTO
+        {
+            Id = i.Id,
+            Nome = i.Nome,
+            Tipo = i.Tipo,
+            Rentabilidade = i.Rentabilidade,
+            Risco = i.Risco
+        });
+
+        return Ok(produtosDto);
     }
 }

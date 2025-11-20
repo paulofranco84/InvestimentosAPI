@@ -47,7 +47,7 @@ public class InvestimentosControllerTests
         var result = await _controller.Obter(1);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var lista = Assert.IsAssignableFrom<IEnumerable<Investimento>>(okResult.Value);
+        var lista = Assert.IsAssignableFrom<IEnumerable<InvestimentoResponseDTO>>(okResult.Value);
         Assert.Empty(lista);
     }
 
@@ -66,7 +66,7 @@ public class InvestimentosControllerTests
         var result = await _controller.Obter(1);
 
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var lista = Assert.IsAssignableFrom<IEnumerable<Investimento>>(okResult.Value);
+        var lista = Assert.IsAssignableFrom<IEnumerable<InvestimentoResponseDTO>>(okResult.Value);
         Assert.Single(lista);
     }
 

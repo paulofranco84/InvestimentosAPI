@@ -1,21 +1,13 @@
 # Investimentos API
 
+Este projeto é uma **API Web** desenvolvida em **ASP.NET Core 8.0** com o objetivo de simular e gerenciar investimentos. 
+A arquitetura da aplicação segue o padrão de **Camadas** (Domain, Application, Infrastructure, API), promovendo a separação de responsabilidades, manutenibilidade e testabilidade do código.
 API desenvolvida para fins de produção temática do PSI 14931 - ASSISTENTE SENIOR (2058), com foco em backend C#.
 
 ---
 
-## Tecnologias
-- **ASP.NET Core 8** 
-- **SQLite + EF Core**
-- **OpenTelemetry**
-- **JWT Auth com Identity**
-- **xUnit + Moq**
-- **Docker**
-
----
-
 ## Introdução
-Esta API foi desenvolvida em **.NET 8** seguindo o padrão **DDD**. Na primeira execução, é realizado o *seed* de produtos, clientes e investimentos para testes iniciais.
+Esta API foi desenvolvida seguindo o padrão **DDD**. Na primeira execução, é realizado o *seed* de produtos, clientes e investimentos para testes iniciais.
 
 Foi disponibilizado um CRUD básico utilizando repositório genérico para inclusão de novos clientes e produtos, além da possibilidade de realizar investimentos.
 
@@ -23,11 +15,41 @@ Para acesso ao banco e persistência dos dados, é utilizado o padrão **Unit of Wo
 
 ---
 
+## Tecnologias Utilizadas
+
+A tabela a seguir lista as principais tecnologias e ferramentas utilizadas no desenvolvimento desta API:
+
+| Categoria         | Tecnologia                  | Propósito                                                                 |
+| :---              | :---                        | :---                                                                      |
+| **Linguagem**     | C#                          | Linguagem de programação.                                                 |
+| **Backend**       | ASP.NET Core                | Framework principal para construção da API.                               |
+| **Banco de Dados**| SQLite                      | Banco de dados leve e baseado em arquivo, ideal para desenvolvimento e testes. |
+| **ORM**           | Entity Framework Core       | Mapeamento Objeto-Relacional para interação com o banco de dados.         |
+| **Autenticação**  | ASP.NET Core Identity       | Gerenciamento de usuários e senhas.                                       |
+| **Autorização**   | JWT Bearer                  | Geração e validação de tokens de acesso para endpoints protegidos.        |
+| **Documentação**  | Swagger/OpenAPI             | Interface interativa para testar e documentar os endpoints da API.        |
+| **Monitoramento** | OpenTelemetry               | Instrumentação para rastreamento (Tracing) e métricas (Metrics).          |
+| **Arquitetura**   | Camadas (Domain, Application, Infrastructure, API) | Organização do código para alta coesão e baixo acoplamento. |
+
+## Estrutura do Projeto
+
+O projeto está organizado em quatro camadas principais:
+
+*   **Investimentos.Domain:** Contém as entidades de negócio (`Cliente`, `Produto`, `Simulacao`), interfaces de repositório e serviços de domínio.
+*   **Investimentos.Application:** Contém os DTOs (Data Transfer Objects) e os serviços de aplicação (`SimulacaoService`, `TokenService`, `TelemetriaService`), responsáveis pela lógica de negócio e orquestração.
+*   **Investimentos.Infrastructure:** Contém a implementação dos repositórios, o contexto do Entity Framework Core (`AppDbContext`), as classes de *seed* de dados e a configuração do Identity.
+*   **Investimentos.API:** A camada de apresentação, contendo os *Controllers*, middlewares e a configuração inicial da aplicação (`Program.cs`).
+
+---
+
 ## Autenticação
 A API utiliza autenticação **JWT** implementada com **Microsoft ASP.NET Core Identity**.  
+
 Na primeira execução, é criado um usuário de testes com:
 - **Login:** `admin`
 - **Senha:** `admin`
+
+**Observação:** As regras de complexidade de senha foram simplificadas para fins de teste (`options.Password.RequiredLength = 1`).
 
 Também é possível cadastrar novos usuários.
 
@@ -168,10 +190,3 @@ Devido ao tempo limitado, foram priorizados testes para controladores e serviços
 
 ## Docker
 A API está habilitada para execução via **Docker**.
-
-### Executando com Docker
-```bash
-docker-compose up --build
-```
-
----
