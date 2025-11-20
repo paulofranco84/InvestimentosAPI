@@ -9,4 +9,6 @@ public class Investimento
     public int PrazoMeses { get; set; }
     public decimal Rentabilidade { get; set; }
     public DateTime Data { get; set; }
+    public int ProdutoId { get; set; }
+    public Produto? Produto { get; set; }
 }

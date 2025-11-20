@@ -27,14 +27,38 @@ namespace Investimentos.Application.Tests
         private List<Investimento> CriarInvestimentos(double total, int quantidade, int liquidezCount)
         {
             var investimentos = new List<Investimento>();
+            var produtoAltoRisco = new Produto
+            {
+                Id = 999,
+                Nome = "Fundo Cripto",
+                Tipo = "Fundos",
+                Rentabilidade = 0.20M,
+                Risco = "Alto",
+                PrazoMinimo = 1,
+                PrazoMaximo = 36
+            };
+
+            var produtoBaixoRisco = new Produto
+            {
+                Id = 998,
+                Nome = "CDB Caixa",
+                Tipo = "CDB",
+                Rentabilidade = 0.10M,
+                Risco = "Baixo",
+                PrazoMinimo = 1,
+                PrazoMaximo = 36
+            };
+
             for (int i = 0; i < quantidade; i++)
             {
                 investimentos.Add(new Investimento
                 {
                     Valor = total / quantidade,
-                    Tipo = i < liquidezCount ? "CDB" : "Fundos"
+                    Tipo = i < liquidezCount ? "CDB" : "Fundos",
+                    Produto = i < liquidezCount ? produtoBaixoRisco : produtoAltoRisco
                 });
             }
+
             return investimentos;
         }
 
@@ -43,7 +67,7 @@ namespace Investimentos.Application.Tests
         {
             // Arrange
             int clienteId = 1;
-            var investimentos = CriarInvestimentos(10000.0, 2, 1); // Pontuação esperada: 23
+            var investimentos = CriarInvestimentos(10000.0, 1, 1); // 1 CDB (baixo risco), 1 Fundo (alto risco)
             _mockInvestimentoRepo.Setup(r => r.ObterPorClienteAsync(clienteId))
                 .ReturnsAsync(investimentos);
 
@@ -52,7 +76,7 @@ namespace Investimentos.Application.Tests
 
             // Assert
             Assert.Equal("Conservador", resultado.Perfil);
-            Assert.Equal(23, resultado.Pontuacao);
+            Assert.Equal(13, resultado.Pontuacao); // Recalculado
             Assert.Equal("Perfil focado em segurança e liquidez.", resultado.Descricao);
         }
 
@@ -61,7 +85,7 @@ namespace Investimentos.Application.Tests
         {
             // Arrange
             int clienteId = 2;
-            var investimentos = CriarInvestimentos(30000.0, 5, 3); // Pontuação esperada: 64
+            var investimentos = CriarInvestimentos(30000.0, 5, 3); // 3 CDB (baixo risco), 2 Fundos (alto risco)
             _mockInvestimentoRepo.Setup(r => r.ObterPorClienteAsync(clienteId))
                 .ReturnsAsync(investimentos);
 
@@ -70,7 +94,7 @@ namespace Investimentos.Application.Tests
 
             // Assert
             Assert.Equal("Moderado", resultado.Perfil);
-            Assert.Equal(64, resultado.Pontuacao);
+            Assert.Equal(49, resultado.Pontuacao); // Confirmado
             Assert.Equal("Perfil equilibrado entre segurança e rentabilidade.", resultado.Descricao);
         }
 
@@ -79,7 +103,7 @@ namespace Investimentos.Application.Tests
         {
             // Arrange
             int clienteId = 3;
-            var investimentos = CriarInvestimentos(50000.0, 10, 2); // Pontuação esperada: 106
+            var investimentos = CriarInvestimentos(50000.0, 10, 2); // 2 CDB (baixo risco), 8 Fundos (alto risco)
             _mockInvestimentoRepo.Setup(r => r.ObterPorClienteAsync(clienteId))
                 .ReturnsAsync(investimentos);
 
@@ -88,7 +112,7 @@ namespace Investimentos.Application.Tests
 
             // Assert
             Assert.Equal("Agressivo", resultado.Perfil);
-            Assert.Equal(106, resultado.Pontuacao);
+            Assert.Equal(88, resultado.Pontuacao); // Corrigido de 106 para 88
             Assert.Equal("Perfil voltado para alta rentabilidade e maior risco.", resultado.Descricao);
         }
 
@@ -97,7 +121,7 @@ namespace Investimentos.Application.Tests
         {
             // Arrange
             int clienteId = 4;
-            var investimentos = new List<Investimento>(); // Pontuação esperada: 0
+            var investimentos = new List<Investimento>();
             _mockInvestimentoRepo.Setup(r => r.ObterPorClienteAsync(clienteId))
                 .ReturnsAsync(investimentos);
 

@@ -66,24 +66,6 @@ namespace Investimentos.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Investimentos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    ClienteId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Tipo = table.Column<string>(type: "TEXT", nullable: false),
-                    Valor = table.Column<double>(type: "REAL", nullable: false),
-                    PrazoMeses = table.Column<int>(type: "INTEGER", nullable: false),
-                    Rentabilidade = table.Column<decimal>(type: "TEXT", nullable: false),
-                    Data = table.Column<DateTime>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Investimentos", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Produtos",
                 columns: table => new
                 {
@@ -223,6 +205,31 @@ namespace Investimentos.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Investimentos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ClienteId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Tipo = table.Column<string>(type: "TEXT", nullable: false),
+                    Valor = table.Column<double>(type: "REAL", nullable: false),
+                    PrazoMeses = table.Column<int>(type: "INTEGER", nullable: false),
+                    Rentabilidade = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Data = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ProdutoId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Investimentos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Investimentos_Produtos_ProdutoId",
+                        column: x => x.ProdutoId,
+                        principalTable: "Produtos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Simulacoes",
                 columns: table => new
                 {
@@ -282,6 +289,11 @@ namespace Investimentos.API.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Investimentos_ProdutoId",
+                table: "Investimentos",
+                column: "ProdutoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Simulacoes_ProdutoId",

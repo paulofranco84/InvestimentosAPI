@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Investimentos.API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251120160226_CriacaoDoBanco")]
+    [Migration("20251120203033_CriacaoDoBanco")]
     partial class CriacaoDoBanco
     {
         /// <inheritdoc />
@@ -120,6 +120,9 @@ namespace Investimentos.API.Migrations
                     b.Property<int>("PrazoMeses")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<decimal>("Rentabilidade")
                         .HasColumnType("TEXT");
 
@@ -131,6 +134,8 @@ namespace Investimentos.API.Migrations
                         .HasColumnType("REAL");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProdutoId");
 
                     b.ToTable("Investimentos");
                 });
@@ -345,6 +350,17 @@ namespace Investimentos.API.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Investimentos.Domain.Entities.Investimento", b =>
+                {
+                    b.HasOne("Investimentos.Domain.Entities.Produto", "Produto")
+                        .WithMany()
+                        .HasForeignKey("ProdutoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Produto");
                 });
 
             modelBuilder.Entity("Investimentos.Domain.Entities.Simulacao", b =>

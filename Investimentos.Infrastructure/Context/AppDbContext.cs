@@ -16,8 +16,16 @@ public class AppDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Simulacao>? Simulacoes { get; set; }
     public DbSet<Investimento>? Investimentos { get; set; }
     public DbSet<RegistroTelemetria> RegistrosTelemetria { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Relacionamento Investimento → Produto
+        modelBuilder.Entity<Investimento>()
+            .HasOne(i => i.Produto)
+            .WithMany()
+            .HasForeignKey(i => i.ProdutoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

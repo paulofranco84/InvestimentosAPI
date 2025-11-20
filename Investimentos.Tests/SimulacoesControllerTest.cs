@@ -66,7 +66,7 @@ public class SimulacoesControllerTests
     {
         var request = new SimulacaoRequestDTO { ClienteId = 1, TipoProduto = "CDB", PrazoMeses = 5, Valor = 1000 };
         var cliente = new Cliente { Id = 1 };
-        var produto = new Produto { Id = 2, Tipo = "CDB", PrazoMinimo = 10, PrazoMaximo = 20 };
+        var produto = new Produto { Id = 2, Tipo = "CDB", PrazoMinimo = 10, PrazoMaximo = 20 , Nome = "CDB Caixa 2026", Rentabilidade = 0.20M, Risco = "Baixo"};
 
         _mockUof.Setup(u => u.ClienteRepository.GetAsync(It.IsAny<Expression<Func<Cliente, bool>>>()))
                 .ReturnsAsync(cliente);

@@ -14,20 +14,57 @@ public class PerfilRiscoService : IPerfilRiscoService
     public async Task<PerfilRisco> CalcularPerfilAsync(int clienteId)
     {
         var investimentos = await _uof.InvestimentoRepository.ObterPorClienteAsync(clienteId);
-        var total = investimentos.Sum(i => i.Valor);
-        var frequencia = investimentos.Count();
-        var liquidez = investimentos.Count(i => i.Tipo.Contains("Tesouro") || i.Tipo.Contains("CDB"));
+        if (!investimentos.Any())
+        {
+            return new PerfilRisco
+            {
+                ClienteId = clienteId,
+                Perfil = "Conservador",
+                Pontuacao = 0,
+                Descricao = "Sem investimentos registrados."
+            };
+        }
 
-        var pontuacao = (int)(total / 1000) + frequencia * 5 + liquidez * 3;
+        // 1. Pontuação por risco
+        double riscoTotal = 0;
+        double valorTotal = investimentos.Sum(i => i.Valor);
 
-        var perfil = pontuacao switch
+        foreach (var i in investimentos)
+        {
+            double pesoRisco = i.Produto.Risco switch
+            {
+                "Baixo" => 0.2,
+                "Médio" => 0.6,
+                "Alto" => 1.0,
+                _ => 0.5
+            };
+
+            riscoTotal += i.Valor * pesoRisco;
+        }
+
+        double riscoScore = (riscoTotal / valorTotal) * 100;
+
+        // 2. Pontuação por frequência (máximo 100)
+        int movimentacoes = investimentos.Count();
+        double freqScore = Math.Min(movimentacoes * 10, 100);
+
+        // 3. Pontuação por liquidez
+        int liquidos = investimentos.Count(i => i.Tipo.Contains("Tesouro") || i.Tipo.Contains("CDB"));
+        double liquidezScore = (liquidos / (double)movimentacoes) * 100;
+
+        // 4. Cálculo final com pesos
+        double pontuacaoFinal = (riscoScore * 0.5) + (freqScore * 0.3) + ((100 - liquidezScore) * 0.2);
+        pontuacaoFinal = Math.Round(pontuacaoFinal, 2);
+
+        // 5. Classificação
+        string perfil = pontuacaoFinal switch
         {
             <= 40 => "Conservador",
             <= 70 => "Moderado",
             _ => "Agressivo"
         };
 
-        var descricao = perfil switch
+        string descricao = perfil switch
         {
             "Conservador" => "Perfil focado em segurança e liquidez.",
             "Moderado" => "Perfil equilibrado entre segurança e rentabilidade.",
@@ -39,7 +76,7 @@ public class PerfilRiscoService : IPerfilRiscoService
         {
             ClienteId = clienteId,
             Perfil = perfil,
-            Pontuacao = pontuacao,
+            Pontuacao = (int)pontuacaoFinal,
             Descricao = descricao
         };
     }

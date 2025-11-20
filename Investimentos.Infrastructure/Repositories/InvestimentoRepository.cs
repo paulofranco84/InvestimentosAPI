@@ -14,8 +14,13 @@ public class InvestimentoRepository : IInvestimentoRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<Investimento>> ObterPorClienteAsync(int clienteId) =>
-        await _context.Investimentos.Where(i => i.ClienteId == clienteId).ToListAsync();
+    public async Task<IEnumerable<Investimento>> ObterPorClienteAsync(int clienteId)
+    {
+        return await _context.Investimentos
+            .Include(i => i.Produto)
+            .Where(i => i.ClienteId == clienteId)
+            .ToListAsync();
+    }
 
     public async Task Adicionar(Investimento _investimento)
     {
@@ -25,6 +30,6 @@ public class InvestimentoRepository : IInvestimentoRepository
 
     public async Task<Investimento> GetAsync(int investimentoId)
     {
-        return await _context.Investimentos.FirstOrDefaultAsync(i => i.Id == investimentoId);
+        return await _context.Investimentos.Include(i => i.Produto).FirstOrDefaultAsync(i => i.Id == investimentoId);
     }
 }

@@ -61,6 +61,7 @@ public class InvestimentosController : ControllerBase
             PrazoMeses = _investimento.PrazoMeses,
             Rentabilidade = produtoSelecionado.Rentabilidade,
             Tipo = produtoSelecionado.Tipo,
+            Produto = produtoSelecionado,
             Data = DateTime.UtcNow
         };
         

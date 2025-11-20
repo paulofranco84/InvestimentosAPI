@@ -33,12 +33,12 @@ public static class SeedData
         );
 
         context.Investimentos.AddRange(
-            new Investimento { ClienteId = 123, Tipo = "CDB", Valor = 5000, PrazoMeses = 12, Rentabilidade = 0.12M, Data = new DateTime(2025, 1, 15) },
-            new Investimento { ClienteId = 124, Tipo = "Fundo", Valor = 3000, PrazoMeses = 24, Rentabilidade = 0.18M, Data = new DateTime(2025, 3, 10) },
-            new Investimento { ClienteId = 124, Tipo = "LCI", Valor = 10000, PrazoMeses = 18, Rentabilidade = 0.13M, Data = new DateTime(2025, 4, 8) },
-            new Investimento { ClienteId = 125, Tipo = "Cripto", Valor = 10000, PrazoMeses = 12, Rentabilidade = 0.20M, Data = new DateTime(2025, 4, 18) },
-            new Investimento { ClienteId = 126, Tipo = "Tesouro", Valor = 20000, PrazoMeses = 6, Rentabilidade = 0.10M, Data = new DateTime(2025, 5, 10) },
-            new Investimento { ClienteId = 127, Tipo = "LCA", Valor = 15000, PrazoMeses = 12, Rentabilidade = 0.14M, Data = new DateTime(2025, 5, 16) }
+            new Investimento { ClienteId = 123, Tipo = "CDB", Valor = 5000, PrazoMeses = 12, Rentabilidade = 0.12M, Data = new DateTime(2025, 1, 15), ProdutoId = 101 },
+            new Investimento { ClienteId = 124, Tipo = "Fundo", Valor = 3000, PrazoMeses = 24, Rentabilidade = 0.18M, Data = new DateTime(2025, 3, 10), ProdutoId = 102 },
+            new Investimento { ClienteId = 124, Tipo = "LCI", Valor = 10000, PrazoMeses = 18, Rentabilidade = 0.13M, Data = new DateTime(2025, 4, 8), ProdutoId = 103 },
+            new Investimento { ClienteId = 125, Tipo = "Cripto", Valor = 10000, PrazoMeses = 12, Rentabilidade = 0.20M, Data = new DateTime(2025, 4, 18), ProdutoId = 106 },
+            new Investimento { ClienteId = 126, Tipo = "Tesouro", Valor = 20000, PrazoMeses = 6, Rentabilidade = 0.10M, Data = new DateTime(2025, 5, 10), ProdutoId = 105 },
+            new Investimento { ClienteId = 127, Tipo = "LCA", Valor = 15000, PrazoMeses = 12, Rentabilidade = 0.14M, Data = new DateTime(2025, 5, 16), ProdutoId = 104 }
         );
 
         await context.SaveChangesAsync();
