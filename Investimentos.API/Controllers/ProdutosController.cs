@@ -12,9 +12,11 @@ namespace Investimentos.API.Controllers;
 public class ProdutosController : ControllerBase
 {
     private readonly IUnitOfWork _uof;
-    public ProdutosController(IUnitOfWork unitOfWork)
+    private readonly IPerfilRiscoService _perfilService;
+    public ProdutosController(IUnitOfWork unitOfWork, IPerfilRiscoService perfilRisco)
     {
         _uof = unitOfWork;
+        _perfilService = perfilRisco;
     }
 
     [HttpGet]
@@ -84,6 +86,35 @@ public class ProdutosController : ControllerBase
     public async Task<IActionResult> Recomendados(string perfil)
     {
         var produtos = await _uof.ProdutoRepository.ObterPorPerfilAsync(perfil);
+
+        if (!produtos.Any()) return BadRequest("Perfil inválido");
+
+        var produtosDto = produtos.Select(i => new ProdutoDTO
+        {
+            Id = i.Id,
+            Nome = i.Nome,
+            Tipo = i.Tipo,
+            Rentabilidade = i.Rentabilidade,
+            Risco = i.Risco
+        });
+
+        return Ok(produtosDto);
+    }
+
+    [HttpGet("produtos-recomendados-por-cliente/{clienteId}")]
+    public async Task<IActionResult> RecomendadosCliente(int clienteId)
+    {
+        var cliente = await _uof.ClienteRepository.GetAsync(c => c.Id == clienteId);
+
+        if (cliente is null)
+            return BadRequest("Cliente não encontrado");
+
+        var perfil = await _perfilService.CalcularPerfilAsync(clienteId);
+
+        if (perfil is null)
+            return BadRequest("Não foi possível calcular o perfil do cliente");
+
+        var produtos = await _uof.ProdutoRepository.ObterTop3PorPerfilAsync(perfil.Perfil);
 
         if (!produtos.Any()) return BadRequest("Perfil inválido");
 

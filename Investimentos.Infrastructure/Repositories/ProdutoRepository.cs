@@ -32,4 +32,17 @@ public class ProdutoRepository : Repository<Produto>, IProdutoRepository
         return await _context.Produtos
             .FirstOrDefaultAsync(p => p.Tipo.ToLower() == tipo.ToLower());
     }
+
+    public async Task<IEnumerable<Produto>> ObterTop3PorPerfilAsync(string perfil)
+    {
+        var perfilNormalizado = perfil.ToLowerInvariant();
+
+        return perfilNormalizado switch
+        {
+            "conservador" => await _context.Produtos.Where(p => p.Risco == "Baixo").OrderByDescending(p => (double)p.Rentabilidade).Take(3).ToListAsync(),
+            "moderado" => await _context.Produtos.Where(p => p.Risco != "Alto").OrderByDescending(p => (double)p.Rentabilidade).Take(3).ToListAsync(),
+            "agressivo" => await _context.Produtos.OrderByDescending(p => (double)p.Rentabilidade).Take(3).ToListAsync(),
+            _ => Enumerable.Empty<Produto>()
+        };
+    }
 }
